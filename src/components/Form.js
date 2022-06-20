@@ -1,18 +1,29 @@
 import React, {useState, useContext} from "react";
 import {AlertContext} from "../context/alert/alertContex";
+import {FirebaseContext} from "../context/firebase/firebaseContext";
 
 export const Form = () => {
     const [value, setValue] = useState('')
     const alert = useContext(AlertContext)
+    const firebase = useContext(FirebaseContext)
 
     const submitHandler = event => {
         event.preventDefault()
 
-        alert.show(value, 'success')
+        if(value.trim()) {
+            firebase.addNote(value.trim()).then(()=>{
+                alert.show(' Заметка была создана', 'success')
+            }).catch(()=>{
+                alert.show(' Что-то пошло не так', 'danger')
+            })
+            setValue('')
+        } else {
+            alert.show(' Введите название заметки')
+        }
     }
 
     return(
-        <from onSubmit={submitHandler}>
+        <form onSubmit={submitHandler}>
             <div className="form-group">
                 <input type="text"
                        className="form-control"
@@ -21,6 +32,6 @@ export const Form = () => {
                        onChange={event => setValue(event.target.value)}
                 />
             </div>
-        </from>
+        </form>
     )
 }
